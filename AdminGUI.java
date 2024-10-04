@@ -149,6 +149,8 @@ public class AdminGUI {
                 int year = getIntInput(scanner, 1900, 2100);
                 queries.selectUsersJoinedBeforeYear(year);
                 break;
+            case 4:
+                queries.compareSubscriptionDateJoinDate();
             case 5:
                 System.out.println("Enter the birthday (yyyy-mm-dd):");
                 String birthday = getValidatedDateInput(scanner);
