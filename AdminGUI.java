@@ -151,6 +151,7 @@ public class AdminGUI {
                 break;
             case 4:
                 queries.compareSubscriptionDateJoinDate();
+                break;
             case 5:
                 System.out.println("Enter the birthday (yyyy-mm-dd):");
                 String birthday = getValidatedDateInput(scanner);
