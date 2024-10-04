@@ -1,1468 +1,363 @@
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Date;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseQueries {
-    private String _url;
-    private String cName;
-    private String user;
-    private String Pword;
 
-    public DatabaseQueries(String url, String className, String username, String password) {
-        _url=url;
-        cName=className;
-        user=username;
-        Pword=password;
+    private String url;
+    private String className;
+    private String username;
+    private String password;
+
+    public DatabaseQueries(
+        String url,
+        String className,
+        String username,
+        String password
+    ) {
+        this.url = url;
+        this.className = className;
+        this.username = username;
+        this.password = password;
     }
 
-    // insertion scripts
-    public void insertUser(int userID, String userName, int joinYear, String birthday) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("INSERT INTO USERS (user_id, username, year_of_joining, birthday) VALUES (?, ?, ?, ?);");
-            stmt.setInt(1, userID);
-            stmt.setString(2,userName);
-            stmt.setInt(3,joinYear);
-            stmt.setDate(4,Date.valueOf(birthday));
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the user_id being a duplicate.");
-            System.out.println("It could also be due to the date being in the wrong format.");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void insertSubscription(int subscriptionID, int userID, String billingDetails, String subscriptionDate) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("INSERT INTO SUBSCRIPTIONS (subscription_id, user_id, billing_details, subscription_date) VALUES (?, ?, ?, ?);");
-            stmt.setInt(1, subscriptionID);
-            stmt.setInt(2,userID);
-            stmt.setString(3,billingDetails);
-            stmt.setDate(4,Date.valueOf(subscriptionDate));
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the subscription_id being a duplicate.");
-            System.out.println("It could also be due to the date being in the wrong format.");
-            System.out.println("Or it could be because the user_id does not exist in the system yet.");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void insertArtist(int artistID, String name, String description, boolean isVerified) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("INSERT INTO ARTISTS (artist_id, name, description, is_verified) VALUES (?, ?, ?, ?);");
-            stmt.setInt(1, artistID);
-            stmt.setString(2,name);
-            stmt.setString(3,description);
-            stmt.setBoolean(4,isVerified);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the artist_id being a duplicate.");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void insertAlbum(int albumID, String name, int releaseYear, String image, int artistID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("INSERT INTO ALBUMS (album_id, name, release_year, image, artist_id) VALUES (?, ?, ?, ?);");
-            stmt.setInt(1, albumID);
-            stmt.setString(2,name);
-            stmt.setInt(3,releaseYear);
-            stmt.setString(4,image);
-            stmt.setInt(5,artistID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the album being a duplicate.");
-            System.out.println("It could also be because the artist ID does not exist yet.");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    //TODO: insert songs, likedSongs, playlists, and playlistSongs
+    // ======================= INSERTION METHODS =======================
 
-    //selection scripts
-    public void SelectUsersWithSubscription() {
-        //initialization
-        ResultSet rs = null;
-        Statement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.createStatement();
-            rs=stmt.executeQuery("SELECT u.username FROM USERS u JOIN SUBSCRIPTIONS s ON u.user_id = s.user_id;");
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
-
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+    public void insertUser(
+        int userID,
+        String userName,
+        int joinYear,
+        String birthday
+    ) {
+        String query =
+            "INSERT INTO USERS (user_id, username, year_of_joining, birthday) VALUES (?, ?, ?, ?);";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, userID);
+            ps.setString(2, userName);
+            ps.setInt(3, joinYear);
+            ps.setDate(4, Date.valueOf(birthday));
+        });
     }
-    public void SelectUsersWithNoSubscription() {
-        //initialization
-        ResultSet rs = null;
-        Statement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.createStatement();
-            rs=stmt.executeQuery("SELECT u.username FROM USERS u LEFT JOIN SUBSCRIPTIONS s ON u.user_id = s.user_id WHERE s.user_id IS NULL;");
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
 
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+    public void insertSubscription(
+        int subscriptionID,
+        int userID,
+        String billingDetails,
+        String subscriptionDate
+    ) {
+        String query =
+            "INSERT INTO SUBSCRIPTIONS (subscription_id, user_id, billing_details, subscription_date) VALUES (?, ?, ?, ?);";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, subscriptionID);
+            ps.setInt(2, userID);
+            ps.setString(3, billingDetails);
+            ps.setDate(4, Date.valueOf(subscriptionDate));
+        });
     }
-    public void SelectUsersJoinedBeforeYear(int year) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("SELECT u.username FROM USERS u WHERE u.year_of_joining < ?;");
-            stmt.setInt(1, year);
-            rs=stmt.executeQuery();
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
 
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+    public void insertArtist(
+        int artistID,
+        String name,
+        String description,
+        boolean isVerified
+    ) {
+        String query =
+            "INSERT INTO ARTISTS (artist_id, name, description, is_verified) VALUES (?, ?, ?, ?);";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, artistID);
+            ps.setString(2, name);
+            ps.setString(3, description);
+            ps.setBoolean(4, isVerified);
+        });
     }
+
+    public void insertAlbum(
+        int albumID,
+        String name,
+        int releaseYear,
+        String image,
+        int artistID
+    ) {
+        String query =
+            "INSERT INTO ALBUMS (album_id, name, release_year, image, artist_id) VALUES (?, ?, ?, ?, ?);";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, albumID);
+            ps.setString(2, name);
+            ps.setInt(3, releaseYear);
+            ps.setString(4, image);
+            ps.setInt(5, artistID);
+        });
+    }
+
+    // ======================= SELECTION METHODS =======================
+
+    public void selectUsersWithSubscription() {
+        String query =
+            "SELECT u.username FROM USERS u JOIN SUBSCRIPTIONS s ON u.user_id = s.user_id;";
+        executeSelect(query);
+    }
+
+    public void selectUsersWithoutSubscription() {
+        String query =
+            "SELECT u.username FROM USERS u LEFT JOIN SUBSCRIPTIONS s ON u.user_id = s.user_id WHERE s.user_id IS NULL;";
+        executeSelect(query);
+    }
+
+    public void selectUsersJoinedBeforeYear(int year) {
+        String query =
+            "SELECT u.username FROM USERS u WHERE u.year_of_joining < ?;";
+        executeSelect(query, ps -> ps.setInt(1, year));
+    }
+
     public void compareSubscriptionDateJoinDate() {
-        //initialization
-        ResultSet rs = null;
-        Statement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.createStatement();
-            rs=stmt.executeQuery("SELECT u.username, u.year_of_joining, s.subscription_date FROM USERS u JOIN SUBSCRIPTIONS s ON u.user_id = s.user_id;");
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
-
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+        String query =
+            "SELECT u.username, u.year_of_joining, s.subscription_date FROM USERS u JOIN SUBSCRIPTIONS s ON u.user_id = s.user_id;";
+        executeSelect(query);
     }
-    public void SelectUsersWithBirthday(String birthday) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("SELECT u.username FROM USERS u WHERE u.birthday = ?;");
-            stmt.setDate(1, Date.valueOf(birthday));
-            rs=stmt.executeQuery();
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
 
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-            System.out.println("This is likely because the date is in the wrong format.");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+    public void selectUsersWithBirthday(String birthday) {
+        String query = "SELECT u.username FROM USERS u WHERE u.birthday = ?;";
+        executeSelect(query, ps -> ps.setDate(1, Date.valueOf(birthday)));
     }
+
     public void getSubscriberCount() {
-        //initialization
-        ResultSet rs = null;
-        Statement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.createStatement();
-            rs=stmt.executeQuery("SELECT COUNT(*) AS subscriber_count FROM SUBSCRIPTIONS;");
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
-
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+        String query =
+            "SELECT COUNT(*) AS subscriber_count FROM SUBSCRIPTIONS;";
+        executeSelect(query);
     }
+
     public void getLikedSongPostSubscription() {
-        //initialization
-        ResultSet rs = null;
-        Statement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.createStatement();
-            rs=stmt.executeQuery("SELECT COUNT(DISTINCT s.user_id) AS subscribers_liked_after_subscription FROM SUBSCRIPTIONS s JOIN LIKED_SONGS ls ON s.user_id = ls.user_id WHERE s.subscription_date < ls.liked_date;");
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
-
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+        String query =
+            "SELECT COUNT(DISTINCT s.user_id) AS subscribers_liked_after_subscription FROM SUBSCRIPTIONS s JOIN LIKED_SONGS ls ON s.user_id = ls.user_id WHERE s.subscription_date < ls.liked_date;";
+        executeSelect(query);
     }
-    public void SelectSongsLikedByUser(int userID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("SELECT s.song_name, s.release_year, ls.liked_date FROM LIKED_SONGS ls JOIN SONGS s ON ls.song_id = s.song_id WHERE ls.user_id = ?;");
-            stmt.setInt(1, userID);
-            rs=stmt.executeQuery();
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
 
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+    public void selectSongsLikedByUser(int userID) {
+        String query =
+            "SELECT s.song_name, s.release_year, ls.liked_date FROM LIKED_SONGS ls JOIN SONGS s ON ls.song_id = s.song_id WHERE ls.user_id = ?;";
+        executeSelect(query, ps -> ps.setInt(1, userID));
     }
-    public void SelectSongsByAlbum(int albumID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("SELECT s.song_name, s.release_year FROM SONGS s WHERE s.album_id = ?;");
-            stmt.setInt(1, albumID);
-            rs=stmt.executeQuery();
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
 
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+    public void selectSongsByAlbum(int albumID) {
+        String query =
+            "SELECT s.song_name, s.release_year FROM SONGS s WHERE s.album_id = ?;";
+        executeSelect(query, ps -> ps.setInt(1, albumID));
     }
-    public void SelectSongsLikedBeforeDate(String day) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("SELECT s.song_name, ls.liked_date FROM LIKED_SONGS ls JOIN SONGS s ON ls.song_id = s.song_id WHERE ls.liked_date < ?;");
-            stmt.setDate(1, Date.valueOf(day));
-            rs=stmt.executeQuery();
-            ResultSetMetaData metaData = rs.getMetaData();
-            int numColumns = metaData.getColumnCount();
 
-            //print out column headers
-            for (int i=1; i <= numColumns; i++) {
-                System.out.print(metaData.getColumnLabel(i) + "\t");
-            }
-            System.out.println("");
-            //print out the data
-            Object obj = null;
-            //while there are upcoming items
-            while (rs.next()) {
-                //go through each column, and print it out
-                for (int i=1; i <= numColumns; i++) {
-                    obj = rs.getObject(i);
-                    if (obj != null) {
-                        System.out.print(rs.getObject(i).toString() + "\t");
-                    }
-                    else {
-                        System.out.print("\t\t");
-                    }
-                }
-                System.out.println("");
-            }
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-            e.printStackTrace();
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query");
-            System.out.println("This is likely because the date is in the wrong format.");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+    public void selectSongsLikedBeforeDate(String day) {
+        String query =
+            "SELECT s.song_name, ls.liked_date FROM LIKED_SONGS ls JOIN SONGS s ON ls.song_id = s.song_id WHERE ls.liked_date < ?;";
+        executeSelect(query, ps -> ps.setDate(1, Date.valueOf(day)));
     }
-    //TODO: select songs in playlistID, select playlists by userID, select songs liked by users joining before year, select verified artists, select albums from year, select albums by artist id, select artists with albums from after a year, select users who liked a song in a playlist id, select artists whose songs are in a playlist id, select top n most liked songs
-    //TODO: from lines 54 onwards in selection SQL script
 
-    //update scripts
+    // ======================= UPDATE METHODS =======================
+
     public void updateUsername(String username, int userID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE users SET username=? WHERE user_id=?;");
-            stmt.setString(1,username);
-            stmt.setInt(2, userID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the user id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+        String query = "UPDATE USERS SET username=? WHERE user_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, username);
+            ps.setInt(2, userID);
+        });
     }
-    public void updateYearofJoining(int joinYear, int userID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE users SET year_of_joining=? WHERE user_id=?;");
-            stmt.setInt(1,joinYear);
-            stmt.setInt(2, userID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the user id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateUserBirthday(String birthday, int userID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE users SET birthday=? WHERE user_id=?;");
-            stmt.setDate(1,Date.valueOf(birthday));
-            stmt.setInt(2, userID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the user id not currently existing");
-            System.out.println("This could also be because the date is in the wrong format");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateBillingDetails(String billingDetails, int subscriptionID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE subscriptions SET billing_details=? WHERE subscription_id=?;");
-            stmt.setString(1,billingDetails);
-            stmt.setInt(2, subscriptionID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the subscription id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateSubscriptionDate(String subscriptionDate, int subscriptionID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE subscriptions SET subscription_date=? WHERE subscription_id=?;");
-            stmt.setDate(1,Date.valueOf(subscriptionDate));
-            stmt.setInt(2, subscriptionID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the subscription id not currently existing");
-            System.out.println("This could also be because the subscription date is in the wrong format");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateArtistName(String name, int artistID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE artists SET name=? WHERE artist_id=?;");
-            stmt.setString(1,name);
-            stmt.setInt(2, artistID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the artist id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateArtistDescription(String desc, int artistID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE artists SET description=? WHERE artist_id=?;");
-            stmt.setString(1,desc);
-            stmt.setInt(2, artistID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the artist id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateArtistVerificationStatus(boolean isVerified, int artistID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE artists SET is_verified=? WHERE artist_id=?;");
-            stmt.setBoolean(1,isVerified);
-            stmt.setInt(2, artistID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the artist id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateAlbumName(String name, int albumID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE albums SET nameimage=? WHERE album_id=?;");
-            stmt.setString(1,name);
-            stmt.setInt(2, albumID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the album id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateAlbumYear(int year, int albumID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE albums SET release_year=? WHERE album_id=?;");
-            stmt.setInt(1,year);
-            stmt.setInt(2, albumID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the album id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateAlbumImage(String imgURL, int albumID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE albums SET image=? WHERE album_id=?;");
-            stmt.setString(1,imgURL);
-            stmt.setInt(2, albumID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the album id not currently existing");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    public void updateAlbumArtist(int artistID, int albumID) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("UPDATE albums SET artist_id=? WHERE album_id=?;");
-            stmt.setInt(1,artistID);
-            stmt.setInt(2, albumID);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to the album id not currently existing");
-            System.out.println("This could also be because the artist id does not currently exist");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
-    }
-    //TODO: add songs.artistID, albumID, songName, releaseYear, category, producer, credits, playlists.creatorID, playlistName, createdDate, published, description
 
-    //delete scripts
-    public void deleteUser(int user_id) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
+    public void updateYearofJoining(int joinYear, int userID) {
+        String query = "UPDATE USERS SET year_of_joining=? WHERE user_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, joinYear);
+            ps.setInt(2, userID);
+        });
+    }
+
+    public void updateUserBirthday(String birthday, int userID) {
+        String query = "UPDATE USERS SET birthday=? WHERE user_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setDate(1, Date.valueOf(birthday));
+            ps.setInt(2, userID);
+        });
+    }
+
+    public void updateBillingDetails(
+        String billingDetails,
+        int subscriptionID
+    ) {
+        String query =
+            "UPDATE SUBSCRIPTIONS SET billing_details=? WHERE subscription_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, billingDetails);
+            ps.setInt(2, subscriptionID);
+        });
+    }
+
+    public void updateSubscriptionDate(
+        String subscriptionDate,
+        int subscriptionID
+    ) {
+        String query =
+            "UPDATE SUBSCRIPTIONS SET subscription_date=? WHERE subscription_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setDate(1, Date.valueOf(subscriptionDate));
+            ps.setInt(2, subscriptionID);
+        });
+    }
+
+    public void updateArtistName(String name, int artistID) {
+        String query = "UPDATE ARTISTS SET name=? WHERE artist_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, name);
+            ps.setInt(2, artistID);
+        });
+    }
+
+    public void updateArtistDescription(String desc, int artistID) {
+        String query = "UPDATE ARTISTS SET description=? WHERE artist_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, desc);
+            ps.setInt(2, artistID);
+        });
+    }
+
+    public void updateArtistVerificationStatus(
+        boolean isVerified,
+        int artistID
+    ) {
+        String query = "UPDATE ARTISTS SET is_verified=? WHERE artist_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setBoolean(1, isVerified);
+            ps.setInt(2, artistID);
+        });
+    }
+
+    public void updateAlbumName(String name, int albumID) {
+        String query = "UPDATE ALBUMS SET name=? WHERE album_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, name);
+            ps.setInt(2, albumID);
+        });
+    }
+
+    public void updateAlbumYear(int year, int albumID) {
+        String query = "UPDATE ALBUMS SET release_year=? WHERE album_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, year);
+            ps.setInt(2, albumID);
+        });
+    }
+
+    public void updateAlbumImage(String imgURL, int albumID) {
+        String query = "UPDATE ALBUMS SET image=? WHERE album_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, imgURL);
+            ps.setInt(2, albumID);
+        });
+    }
+
+    public void updateAlbumArtist(int artistID, int albumID) {
+        String query = "UPDATE ALBUMS SET artist_id=? WHERE album_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, artistID);
+            ps.setInt(2, albumID);
+        });
+    }
+
+    // ======================= DELETE METHODS =======================
+
+    public void deleteUser(int userID) {
+        String query = "DELETE FROM USERS WHERE user_id=?;";
+        executeInsertOrUpdate(query, ps -> ps.setInt(1, userID));
+    }
+
+    public void deleteSubscription(int subscriptionID) {
+        String query = "DELETE FROM SUBSCRIPTIONS WHERE subscription_id=?;";
+        executeInsertOrUpdate(query, ps -> ps.setInt(1, subscriptionID));
+    }
+
+    public void deleteArtist(int artistID) {
+        String query = "DELETE FROM ARTISTS WHERE artist_id=?;";
+        executeInsertOrUpdate(query, ps -> ps.setInt(1, artistID));
+    }
+
+    public void deleteAlbum(int albumID) {
+        String query = "DELETE FROM ALBUMS WHERE album_id=?;";
+        executeInsertOrUpdate(query, ps -> ps.setInt(1, albumID));
+    }
+
+    // ======================= UTILITY METHODS =======================
+
+    private void executeInsertOrUpdate(
+        String query,
+        PreparedStatementSetter setter
+    ) {
+        try (
+            Connection conn = connect();
+            PreparedStatement ps = conn.prepareStatement(query)
+        ) {
             conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("DELETE FROM users WHERE user_id=?;");
-            stmt.setInt(1,user_id);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
+            setter.setParameters(ps);
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected > 0) {
+                System.out.println("The statement successfully executed.");
             }
             conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to other tables depending on this user ID. Please delete them first.");
-            System.out.println("This could also be due to the user ID already not existing. ");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
+        } catch (SQLException | ClassNotFoundException e) {
+            handleException(e);
         }
     }
-    public void deleteSubscription(int user_id) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("DELETE FROM users WHERE user_id=?;");
-            stmt.setInt(1,user_id);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
+
+    private void executeSelect(String query) {
+        executeSelect(query, null);
+    }
+
+    private void executeSelect(String query, PreparedStatementSetter setter) {
+        try (
+            Connection conn = connect();
+            PreparedStatement ps = conn.prepareStatement(query)
+        ) {
+            if (setter != null) {
+                setter.setParameters(ps);
             }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to other tables depending on this user ID. Please delete them first.");
-            System.out.println("This could also be due to the user ID already not existing. ");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
+            try (ResultSet rs = ps.executeQuery()) {
+                printResultSet(rs);
             }
+        } catch (SQLException | ClassNotFoundException e) {
+            handleException(e);
         }
     }
-    public void deleteArtist(int user_id) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("DELETE FROM users WHERE user_id=?;");
-            stmt.setInt(1,user_id);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
+
+    private void printResultSet(ResultSet rs) throws SQLException {
+        ResultSetMetaData metaData = rs.getMetaData();
+        int columnCount = metaData.getColumnCount();
+        for (int i = 1; i <= columnCount; i++) {
+            System.out.print(metaData.getColumnLabel(i) + "\t");
+        }
+        System.out.println();
+        while (rs.next()) {
+            for (int i = 1; i <= columnCount; i++) {
+                Object value = rs.getObject(i);
+                System.out.print(
+                    (value != null ? value.toString() : "") + "\t"
+                );
             }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to other tables depending on this user ID. Please delete them first.");
-            System.out.println("This could also be due to the user ID already not existing. ");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
+            System.out.println();
         }
     }
-    public void deleteAlbum(int user_id) {
-        //initialization
-        ResultSet rs = null;
-        PreparedStatement stmt = null;
-        Connection conn = null;
-        try {
-            Class.forName(cName);
-            conn = DriverManager.getConnection(_url, user, Pword);
-            conn.setAutoCommit(false);
-            //set up a prepared statement
-            stmt=conn.prepareStatement("DELETE FROM users WHERE user_id=?;");
-            stmt.setInt(1,user_id);
-            rs=stmt.executeQuery();
-            //if the statement executes, print SUCCESS, and commit it to the database
-            if(stmt.executeUpdate()>0) {
-                System.out.println("The statement successfully executed");
-            }
-            conn.commit();
-        } catch (ClassNotFoundException e) {
-            System.out.println("The driver does not exist");
-        } catch (SQLException s) {
-            System.out.println("There was an error executing the given query.");
-            System.out.println("This is likely due to other tables depending on this user ID. Please delete them first.");
-            System.out.println("This could also be due to the user ID already not existing. ");
-        } finally {
-            try {
-                //close resources
-                if(rs!=null) {
-                    rs.close();
-                }
-                if(stmt!=null) {
-                    stmt.close();
-                }
-                if (conn!=null) {
-                    conn.rollback();
-                    conn.close();
-                }
-            } catch (SQLException s) {
-                System.out.println("Resources failed to close");
-            }
-        }
+
+    private Connection connect() throws ClassNotFoundException, SQLException {
+        Class.forName(className);
+        return DriverManager.getConnection(url, username, password);
     }
-    //TODO: delete songs, likedSongs, playlists, and playlistSongs
+
+    private void handleException(Exception e) {
+        System.out.println("An error occurred: " + e.getMessage());
+        e.printStackTrace();
+    }
+
+    @FunctionalInterface
+    private interface PreparedStatementSetter {
+        void setParameters(PreparedStatement ps) throws SQLException;
+    }
 }
