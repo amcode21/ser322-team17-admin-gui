@@ -93,8 +93,76 @@ public class DatabaseQueries {
             ps.setInt(5, artistID);
         });
     }
-  //TODO: insert songs, likedSongs, playlists, and playlistSongs
-    
+
+    public void insertSong(
+        int songID,
+        int artistID,
+        int albumID,
+        String songName,
+        int releaseYear,
+        String category,
+        String producer,
+        String credits
+    ) {
+        String query =
+            "INSERT INTO SONGS (song_id, artist_id, album_id, song_name, release_year, category, producer, credits) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, songID);
+            ps.setInt(2, artistID);
+            ps.setInt(3, albumID);
+            ps.setString(4, songName);
+            ps.setInt(5, releaseYear);
+            ps.setString(6, category);
+            ps.setString(7, producer);
+            ps.setString(8, credits);
+        });
+    }
+
+    public void insertLikedSong(
+        int likedID,
+        int userID,
+        int songID,
+        String likedDate
+    ) {
+        String query =
+            "INSERT INTO LIKED_SONGS (liked_id, user_id, song_id, liked_date) VALUES (?, ?, ?, ?);";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, likedID);
+            ps.setInt(2, userID);
+            ps.setInt(3, songID);
+            ps.setDate(4, Date.valueOf(likedDate));
+        });
+    }
+
+    public void insertPlaylist(
+        int playlistID,
+        int creatorID,
+        String playlistName,
+        String createdDate,
+        boolean published,
+        String description
+    ) {
+        String query =
+            "INSERT INTO PLAYLISTS (playlist_id, creator_id, playlist_name, created_date, published_status, description) VALUES (?, ?, ?, ?, ?, ?);";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, playlistID);
+            ps.setInt(2, creatorID);
+            ps.setString(3, playlistName);
+            ps.setDate(4, Date.valueOf(createdDate));
+            ps.setBoolean(5, published);
+            ps.setString(6, description);
+        });
+    }
+
+    public void insertPlaylistSong(int playlistID, int songID) {
+        String query =
+            "INSERT INTO PLAYLIST_SONGS (playlist_id, song_id) VALUES (?, ?);";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, playlistID);
+            ps.setInt(2, songID);
+        });
+    }
+
     // ======================= SELECTION METHODS =======================
 
     public void selectUsersWithSubscription() {
@@ -155,9 +223,67 @@ public class DatabaseQueries {
             "SELECT s.song_name, ls.liked_date FROM LIKED_SONGS ls JOIN SONGS s ON ls.song_id = s.song_id WHERE ls.liked_date < ?;";
         executeSelect(query, ps -> ps.setDate(1, Date.valueOf(day)));
     }
-    //TODO: select songs in playlistID, select playlists by userID, select songs liked by users joining before year, select verified artists, select albums from year, select albums by artist id, select artists with albums from after a year, select users who liked a song in a playlist id, select artists whose songs are in a playlist id, select top n most liked songs
-    //TODO: from lines 54 onwards in selection SQL script
-    
+
+    public void selectSongsInPlaylist(int playlistID) {
+        String query =
+            "SELECT s.song_name, s.release_year FROM PLAYLIST_SONGS ps JOIN SONGS s ON ps.song_id = s.song_id WHERE ps.playlist_id = ?;";
+        executeSelect(query, ps -> ps.setInt(1, playlistID));
+    }
+
+    public void selectPlaylistsByUserID(int userID) {
+        String query =
+            "SELECT p.playlist_name, p.created_date FROM PLAYLISTS p WHERE p.creator_id = ?;";
+        executeSelect(query, ps -> ps.setInt(1, userID));
+    }
+
+    public void selectSongsLikedByUsersBeforeYear(int year) {
+        String query =
+            "SELECT s.song_name, u.username, u.year_of_joining FROM LIKED_SONGS ls JOIN SONGS s ON ls.song_id = s.song_id JOIN USERS u ON ls.user_id = u.user_id WHERE u.year_of_joining < ?;";
+        executeSelect(query, ps -> ps.setInt(1, year));
+    }
+
+    public void selectVerifiedArtists() {
+        String query =
+            "SELECT a.artist_id, a.name FROM ARTISTS a WHERE a.is_verified = TRUE;";
+        executeSelect(query);
+    }
+
+    public void selectAlbumsFromYear(int year) {
+        String query =
+            "SELECT al.album_id, al.name, al.release_year FROM ALBUMS al WHERE al.release_year = ?;";
+        executeSelect(query, ps -> ps.setInt(1, year));
+    }
+
+    public void selectAlbumsByArtistID(int artistID) {
+        String query =
+            "SELECT al.album_id, al.name, al.release_year FROM ALBUMS al WHERE al.artist_id = ?;";
+        executeSelect(query, ps -> ps.setInt(1, artistID));
+    }
+
+    public void selectArtistsWithAlbumsAfterYear(int year) {
+        String query =
+            "SELECT a.name, al.name AS album_name, al.release_year FROM ARTISTS a JOIN ALBUMS al ON a.artist_id = al.artist_id WHERE al.release_year > ?;";
+        executeSelect(query, ps -> ps.setInt(1, year));
+    }
+
+    public void selectUsersWhoLikedSongInPlaylist(int playlistID) {
+        String query =
+            "SELECT u.username, s.song_name, p.playlist_name FROM USERS u JOIN LIKED_SONGS ls ON u.user_id = ls.user_id JOIN SONGS s ON ls.song_id = s.song_id JOIN PLAYLIST_SONGS ps ON s.song_id = ps.song_id JOIN PLAYLISTS p ON ps.playlist_id = p.playlist_id WHERE ps.playlist_id = ?;";
+        executeSelect(query, ps -> ps.setInt(1, playlistID));
+    }
+
+    public void selectArtistsWithSongsInPlaylist(int playlistID) {
+        String query =
+            "SELECT ar.name AS artist_name, s.song_name, p.playlist_name FROM ARTISTS ar JOIN SONGS s ON ar.artist_id = s.artist_id JOIN PLAYLIST_SONGS ps ON s.song_id = ps.song_id JOIN PLAYLISTS p ON ps.playlist_id = p.playlist_id WHERE ps.playlist_id = ?;";
+        executeSelect(query, ps -> ps.setInt(1, playlistID));
+    }
+
+    public void selectTopLikedSongs(int limit) {
+        String query =
+            "SELECT s.song_name, COUNT(ls.song_id) AS like_count FROM LIKED_SONGS ls JOIN SONGS s ON ls.song_id = s.song_id GROUP BY ls.song_id, s.song_name ORDER BY like_count DESC LIMIT ?;";
+        executeSelect(query, ps -> ps.setInt(1, limit));
+    }
+
     // ======================= UPDATE METHODS =======================
 
     public void updateUsername(String username, int userID) {
@@ -266,9 +392,7 @@ public class DatabaseQueries {
             ps.setInt(2, albumID);
         });
     }
-    //TODO: add songs.artistID, albumID, songName, releaseYear, category, producer, credits, playlists.creatorID, playlistName, createdDate, published, description
 
-    
     // ======================= DELETE METHODS =======================
 
     public void deleteUser(int userID) {
@@ -290,20 +414,40 @@ public class DatabaseQueries {
         String query = "DELETE FROM ALBUMS WHERE album_id=?;";
         executeInsertOrUpdate(query, ps -> ps.setInt(1, albumID));
     }
-    //TODO: delete songs, playlists, liked songs, and playlist songs
+
+    public void deleteSong(int songID) {
+        String query = "DELETE FROM SONGS WHERE song_id=?;";
+        executeInsertOrUpdate(query, ps -> ps.setInt(1, songID));
+    }
+
+    public void deleteLikedSong(int likedID) {
+        String query = "DELETE FROM LIKED_SONGS WHERE liked_id=?;";
+        executeInsertOrUpdate(query, ps -> ps.setInt(1, likedID));
+    }
+
+    public void deletePlaylist(int playlistID) {
+        String query = "DELETE FROM PLAYLISTS WHERE playlist_id=?;";
+        executeInsertOrUpdate(query, ps -> ps.setInt(1, playlistID));
+    }
+
+    public void deletePlaylistSong(int playlistID, int songID) {
+        String query =
+            "DELETE FROM PLAYLIST_SONGS WHERE playlist_id=? AND song_id=?;";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setInt(1, playlistID);
+            ps.setInt(2, songID);
+        });
+    }
 
     // ======================= UTILITY METHODS =======================
 
-    //used to improve formatting
     private int getMaxStringLength(String table, String value) {
-        //remove semicolons from the table, so we can simply input a query for it
-        table=table.replaceAll(";","");
-        //I used concatenation, as we are substituting in column names and SQL queries as opposed to parameters
+        table = table.replaceAll(";", "");
         String query =
-                "SELECT max(length("+value+")) FROM ("+table+") as t1;";
+            "SELECT max(length(" + value + ")) FROM (" + table + ") as t1;";
         try (
-                Connection conn = connect();
-                Statement s = conn.createStatement()
+            Connection conn = connect();
+            Statement s = conn.createStatement()
         ) {
             try (ResultSet rs = s.executeQuery(query)) {
                 rs.next();
@@ -356,38 +500,48 @@ public class DatabaseQueries {
     }
 
     private boolean isStringCol(String colLabel) {
-        return
-                colLabel.equals("username") ||
-                colLabel.equals("billing_details") ||
-                colLabel.equals("name") ||
-                colLabel.equals("description") ||
-                colLabel.equals("image") ||
-                colLabel.equals("song_name") ||
-                colLabel.equals("category") ||
-                colLabel.equals("producer") ||
-                colLabel.equals("credits") ||
-                colLabel.equals("playlist_name");
+        return (
+            colLabel.equals("username") ||
+            colLabel.equals("billing_details") ||
+            colLabel.equals("name") ||
+            colLabel.equals("description") ||
+            colLabel.equals("image") ||
+            colLabel.equals("song_name") ||
+            colLabel.equals("category") ||
+            colLabel.equals("producer") ||
+            colLabel.equals("credits") ||
+            colLabel.equals("playlist_name")
+        );
     }
 
-    private void printResultSet(ResultSet rs, String query) throws SQLException {
+    private void printResultSet(ResultSet rs, String query)
+        throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
-        int[] columnLengths=new int[columnCount];
+        int[] columnLengths = new int[columnCount];
         for (int i = 1; i <= columnCount; i++) {
-            //if it is one of the string columns, get the max string length of the query, and compare it to the column label
-            if(isStringCol(metaData.getColumnLabel(i))) {
-                columnLengths[i-1]=Math.max(getMaxStringLength(query,metaData.getColumnLabel(i)),metaData.getColumnLabel(i).length());
+            if (isStringCol(metaData.getColumnLabel(i))) {
+                columnLengths[i - 1] = Math.max(
+                    getMaxStringLength(query, metaData.getColumnLabel(i)),
+                    metaData.getColumnLabel(i).length()
+                );
             } else {
-                columnLengths[i-1]=metaData.getColumnLabel(i).length();
+                columnLengths[i - 1] = metaData.getColumnLabel(i).length();
             }
-            System.out.printf("%-"+columnLengths[i-1]+"s", metaData.getColumnLabel(i));
+            System.out.printf(
+                "%-" + columnLengths[i - 1] + "s",
+                metaData.getColumnLabel(i)
+            );
             System.out.print("\t");
         }
         System.out.println();
         while (rs.next()) {
             for (int i = 1; i <= columnCount; i++) {
                 Object value = rs.getObject(i);
-                System.out.printf("%-"+columnLengths[i-1]+"s", (value != null ? value.toString() : ""));
+                System.out.printf(
+                    "%-" + columnLengths[i - 1] + "s",
+                    (value != null ? value.toString() : "")
+                );
                 System.out.print("\t");
             }
             System.out.println();
