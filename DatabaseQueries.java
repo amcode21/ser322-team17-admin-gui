@@ -93,7 +93,8 @@ public class DatabaseQueries {
             ps.setInt(5, artistID);
         });
     }
-
+  //TODO: insert songs, likedSongs, playlists, and playlistSongs
+    
     // ======================= SELECTION METHODS =======================
 
     public void selectUsersWithSubscription() {
@@ -154,7 +155,9 @@ public class DatabaseQueries {
             "SELECT s.song_name, ls.liked_date FROM LIKED_SONGS ls JOIN SONGS s ON ls.song_id = s.song_id WHERE ls.liked_date < ?;";
         executeSelect(query, ps -> ps.setDate(1, Date.valueOf(day)));
     }
-
+    //TODO: select songs in playlistID, select playlists by userID, select songs liked by users joining before year, select verified artists, select albums from year, select albums by artist id, select artists with albums from after a year, select users who liked a song in a playlist id, select artists whose songs are in a playlist id, select top n most liked songs
+    //TODO: from lines 54 onwards in selection SQL script
+    
     // ======================= UPDATE METHODS =======================
 
     public void updateUsername(String username, int userID) {
@@ -263,7 +266,9 @@ public class DatabaseQueries {
             ps.setInt(2, albumID);
         });
     }
+    //TODO: add songs.artistID, albumID, songName, releaseYear, category, producer, credits, playlists.creatorID, playlistName, createdDate, published, description
 
+    
     // ======================= DELETE METHODS =======================
 
     public void deleteUser(int userID) {
@@ -285,6 +290,7 @@ public class DatabaseQueries {
         String query = "DELETE FROM ALBUMS WHERE album_id=?;";
         executeInsertOrUpdate(query, ps -> ps.setInt(1, albumID));
     }
+    //TODO: add songs.artistID, albumID, songName, releaseYear, category, producer, credits, playlists.creatorID, playlistName, createdDate, published, description
 
     // ======================= UTILITY METHODS =======================
 
