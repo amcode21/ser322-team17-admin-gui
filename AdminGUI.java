@@ -149,7 +149,7 @@ public class AdminGUI {
         System.out.println("3. Artist");
         System.out.println("4. Album");
 
-        int updateOption = getIntInput(scanner, 1, 4);
+        int updateOption = getIntInput(scanner, 1, 8);
 
         switch (updateOption) {
             case 1:
@@ -182,6 +182,7 @@ public class AdminGUI {
                         break;
                 }
                 break;
+                //TODO: fill in for other fields
             default:
                 System.out.println("Invalid option. Returning to main menu.");
                 break;
