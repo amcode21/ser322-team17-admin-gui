@@ -290,9 +290,30 @@ public class DatabaseQueries {
         String query = "DELETE FROM ALBUMS WHERE album_id=?;";
         executeInsertOrUpdate(query, ps -> ps.setInt(1, albumID));
     }
-    //TODO: add songs.artistID, albumID, songName, releaseYear, category, producer, credits, playlists.creatorID, playlistName, createdDate, published, description
+    //TODO: delete songs, playlists, liked songs, and playlist songs
 
     // ======================= UTILITY METHODS =======================
+
+    //used to improve formatting
+    private int getMaxStringLength(String table, String value) {
+        //remove semicolons from the table, so we can simply input a query for it
+        table=table.replaceAll(";","");
+        //I used concatenation, as we are substituting in column names and SQL queries as opposed to parameters
+        String query =
+                "SELECT max(length("+value+")) FROM ("+table+") as t1;";
+        try (
+                Connection conn = connect();
+                Statement s = conn.createStatement()
+        ) {
+            try (ResultSet rs = s.executeQuery(query)) {
+                rs.next();
+                return rs.getInt(1);
+            }
+        } catch (SQLException | ClassNotFoundException e) {
+            handleException(e);
+            return 0;
+        }
+    }
 
     private void executeInsertOrUpdate(
         String query,
@@ -327,26 +348,47 @@ public class DatabaseQueries {
                 setter.setParameters(ps);
             }
             try (ResultSet rs = ps.executeQuery()) {
-                printResultSet(rs);
+                printResultSet(rs, query);
             }
         } catch (SQLException | ClassNotFoundException e) {
             handleException(e);
         }
     }
 
-    private void printResultSet(ResultSet rs) throws SQLException {
+    private boolean isStringCol(String colLabel) {
+        return
+                colLabel.equals("username") ||
+                colLabel.equals("billing_details") ||
+                colLabel.equals("name") ||
+                colLabel.equals("description") ||
+                colLabel.equals("image") ||
+                colLabel.equals("song_name") ||
+                colLabel.equals("category") ||
+                colLabel.equals("producer") ||
+                colLabel.equals("credits") ||
+                colLabel.equals("playlist_name");
+    }
+
+    private void printResultSet(ResultSet rs, String query) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
+        int[] columnLengths=new int[columnCount];
         for (int i = 1; i <= columnCount; i++) {
-            System.out.print(metaData.getColumnLabel(i) + "\t");
+            //if it is one of the string columns, get the max string length of the query, and compare it to the column label
+            if(isStringCol(metaData.getColumnLabel(i))) {
+                columnLengths[i-1]=Math.max(getMaxStringLength(query,metaData.getColumnLabel(i)),metaData.getColumnLabel(i).length());
+            } else {
+                columnLengths[i-1]=metaData.getColumnLabel(i).length();
+            }
+            System.out.printf("%-"+columnLengths[i-1]+"s", metaData.getColumnLabel(i));
+            System.out.print("\t");
         }
         System.out.println();
         while (rs.next()) {
             for (int i = 1; i <= columnCount; i++) {
                 Object value = rs.getObject(i);
-                System.out.print(
-                    (value != null ? value.toString() : "") + "\t"
-                );
+                System.out.printf("%-"+columnLengths[i-1]+"s", (value != null ? value.toString() : ""));
+                System.out.print("\t");
             }
             System.out.println();
         }
