@@ -329,5 +329,354 @@ public class AdminGUI {
                 break;
         }
     }
-    // Remaining update, delete, and utility methods...
+
+    private static void update(Scanner scanner, DatabaseQueries queries) {
+        System.out.println("Please select what you would like to update:");
+        System.out.println("1. User");
+        System.out.println("2. Subscription");
+        System.out.println("3. Artist");
+        System.out.println("4. Album");
+        System.out.println("5. Song");
+        System.out.println("6. Playlist");
+
+        int updateOption = getIntInput(scanner, 1, 6);
+
+        switch (updateOption) {
+            case 1:
+                System.out.println("Enter user ID:");
+                int userId = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                System.out.println(
+                    "Select value to update: 1. Username, 2. Year of joining, 3. Birthday"
+                );
+                int userField = getIntInput(scanner, 1, 3);
+                switch (userField) {
+                    case 1:
+                        System.out.println("Enter new username:");
+                        String username = getSanitizedStringInput(scanner);
+                        queries.updateUsername(username, userId);
+                        break;
+                    case 2:
+                        System.out.println("Enter new year of joining:");
+                        int yearOfJoining = getIntInput(scanner, 1900, 2100);
+                        queries.updateYearofJoining(yearOfJoining, userId);
+                        break;
+                    case 3:
+                        System.out.println("Enter new birthday (yyyy-mm-dd):");
+                        String birthday = getValidatedDateInput(scanner);
+                        queries.updateUserBirthday(birthday, userId);
+                        break;
+                    default:
+                        System.out.println(
+                            "Invalid input. Returning to the main menu."
+                        );
+                        break;
+                }
+                break;
+            case 2:
+                System.out.println("Enter subscription ID:");
+                int subscriptionID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                System.out.println(
+                    "Select value to update: 1. Billing Details, 2. Subscription Date"
+                );
+                int subscriptionField = getIntInput(scanner, 1, 2);
+                switch (subscriptionField) {
+                    case 1:
+                        System.out.println("Enter new billing details:");
+                        String billingDetails = getSanitizedStringInput(
+                            scanner
+                        );
+                        queries.updateBillingDetails(
+                            billingDetails,
+                            subscriptionID
+                        );
+                        break;
+                    case 2:
+                        System.out.println(
+                            "Enter new subscription date (yyyy-mm-dd):"
+                        );
+                        String subscriptionDate = getValidatedDateInput(
+                            scanner
+                        );
+                        queries.updateSubscriptionDate(
+                            subscriptionDate,
+                            subscriptionID
+                        );
+                        break;
+                    default:
+                        System.out.println(
+                            "Invalid input. Returning to the main menu."
+                        );
+                        break;
+                }
+                break;
+            case 3:
+                System.out.println("Enter artist ID:");
+                int artistID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                System.out.println(
+                    "Select value to update: 1. Name, 2. Description, 3. Verified Status"
+                );
+                int artistField = getIntInput(scanner, 1, 3);
+                switch (artistField) {
+                    case 1:
+                        System.out.println("Enter new name:");
+                        String name = getSanitizedStringInput(scanner);
+                        queries.updateArtistName(name, artistID);
+                        break;
+                    case 2:
+                        System.out.println("Enter new description:");
+                        String description = getSanitizedStringInput(scanner);
+                        queries.updateArtistDescription(description, artistID);
+                        break;
+                    case 3:
+                        System.out.println("Enter new verified status:");
+                        boolean verifiedStatus = getBooleanInput(scanner);
+                        queries.updateArtistVerificationStatus(
+                            verifiedStatus,
+                            artistID
+                        );
+                        break;
+                    default:
+                        System.out.println(
+                            "Invalid input. Returning to the main menu."
+                        );
+                        break;
+                }
+                break;
+            case 4:
+                System.out.println("Enter album ID:");
+                int albumID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                System.out.println(
+                    "Select value to update: 1. Name, 2. Release Year, 3. Image URL, 4. Artist ID"
+                );
+                int albumField = getIntInput(scanner, 1, 4);
+                switch (albumField) {
+                    case 1:
+                        System.out.println("Enter new name:");
+                        String name = getSanitizedStringInput(scanner);
+                        queries.updateAlbumName(name, albumID);
+                        break;
+                    case 2:
+                        System.out.println("Enter new release year:");
+                        int releaseYear = getIntInput(scanner, 1900, 2100);
+                        queries.updateAlbumYear(releaseYear, albumID);
+                        break;
+                    case 3:
+                        System.out.println("Enter new image URL:");
+                        String imgURL = getSanitizedStringInput(scanner);
+                        queries.updateAlbumImage(imgURL, albumID);
+                        break;
+                    case 4:
+                        System.out.println("Enter new artist ID:");
+                        int artistIDForAlbum = getIntInput(
+                            scanner,
+                            1,
+                            Integer.MAX_VALUE
+                        );
+                        queries.updateAlbumArtist(artistIDForAlbum, albumID);
+                        break;
+                    default:
+                        System.out.println(
+                            "Invalid input. Returning to the main menu."
+                        );
+                        break;
+                }
+                break;
+            case 5:
+                System.out.println("Enter song ID:");
+                int songID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                System.out.println(
+                    "Select value to update: 1. Name, 2. Category, 3. Producer, 4. Credits"
+                );
+                int songField = getIntInput(scanner, 1, 4);
+                switch (songField) {
+                    case 1:
+                        System.out.println("Enter new name:");
+                        String songName = getSanitizedStringInput(scanner);
+                        queries.updateSongName(songID, songName);
+                        break;
+                    case 2:
+                        System.out.println("Enter new category:");
+                        String category = getSanitizedStringInput(scanner);
+                        queries.updateSongCategory(songID, category);
+                        break;
+                    case 3:
+                        System.out.println("Enter new producer:");
+                        String producer = getSanitizedStringInput(scanner);
+                        queries.updateSongProducer(songID, producer);
+                        break;
+                    case 4:
+                        System.out.println("Enter new credits:");
+                        String credits = getSanitizedStringInput(scanner);
+                        queries.updateSongCredits(songID, credits);
+                        break;
+                    default:
+                        System.out.println(
+                            "Invalid input. Returning to the main menu."
+                        );
+                        break;
+                }
+                break;
+            case 6:
+                System.out.println("Enter playlist ID:");
+                int playlistID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                System.out.println(
+                    "Select value to update: 1. Name, 2. Description, 3. Published Status"
+                );
+                int playlistField = getIntInput(scanner, 1, 3);
+                switch (playlistField) {
+                    case 1:
+                        System.out.println("Enter new name:");
+                        String playlistName = getSanitizedStringInput(scanner);
+                        queries.updatePlaylistName(playlistID, playlistName);
+                        break;
+                    case 2:
+                        System.out.println("Enter new description:");
+                        String description = getSanitizedStringInput(scanner);
+                        queries.updatePlaylistDescription(
+                            playlistID,
+                            description
+                        );
+                        break;
+                    case 3:
+                        System.out.println("Enter new published status:");
+                        boolean published = getBooleanInput(scanner);
+                        queries.updatePlaylistPublishedStatus(
+                            playlistID,
+                            published
+                        );
+                        break;
+                    default:
+                        System.out.println(
+                            "Invalid input. Returning to the main menu."
+                        );
+                        break;
+                }
+                break;
+            default:
+                System.out.println("Invalid option. Returning to main menu.");
+                break;
+        }
+    }
+
+    private static void delete(Scanner scanner, DatabaseQueries queries) {
+        System.out.println("Please select what you would like to delete:");
+        System.out.println("1. User");
+        System.out.println("2. Subscription");
+        System.out.println("3. Artist");
+        System.out.println("4. Album");
+        System.out.println("5. Song");
+        System.out.println("6. Playlist");
+        System.out.println("7. Liked Song");
+        System.out.println("8. Playlist Song");
+
+        int deleteOption = getIntInput(scanner, 1, 8);
+
+        switch (deleteOption) {
+            case 1:
+                System.out.println("Enter user ID:");
+                int userId = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                queries.deleteUser(userId);
+                break;
+            case 2:
+                System.out.println("Enter subscription ID:");
+                int subscriptionID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                queries.deleteSubscription(subscriptionID);
+                break;
+            case 3:
+                System.out.println("Enter artist ID:");
+                int artistID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                queries.deleteArtist(artistID);
+                break;
+            case 4:
+                System.out.println("Enter album ID:");
+                int albumID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                queries.deleteAlbum(albumID);
+                break;
+            case 5:
+                System.out.println("Enter song ID:");
+                int songID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                queries.deleteSong(songID);
+                break;
+            case 6:
+                System.out.println("Enter playlist ID:");
+                int playlistID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                queries.deletePlaylist(playlistID);
+                break;
+            case 7:
+                System.out.println("Enter liked song ID:");
+                int likedID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                queries.deleteLikedSong(likedID);
+                break;
+            case 8:
+                System.out.println("Enter playlist ID and song ID:");
+                int plID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                int plSongID = getIntInput(scanner, 1, Integer.MAX_VALUE);
+                queries.deletePlaylistSong(plID, plSongID);
+                break;
+            default:
+                System.out.println("Invalid option. Returning to main menu.");
+                break;
+        }
+    }
+
+    // Utility methods for input validation and sanitization
+
+    private static int getIntInput(Scanner scanner, int min, int max) {
+        int input;
+        while (true) {
+            if (scanner.hasNextInt()) {
+                input = scanner.nextInt();
+                if (input >= min && input <= max) {
+                    return input;
+                } else {
+                    System.out.println(
+                        "Invalid input. Please enter a number between " +
+                        min +
+                        " and " +
+                        max +
+                        ":"
+                    );
+                }
+            } else {
+                System.out.println(
+                    "Invalid input. Please enter a valid number:"
+                );
+                scanner.next(); // Clear the invalid input
+            }
+        }
+    }
+
+    private static String getSanitizedStringInput(Scanner scanner) {
+        String input = scanner.next();
+        return input.replaceAll("[^a-zA-Z0-9_\\- ]", ""); // Sanitize input by removing special characters
+    }
+
+    private static String getValidatedDateInput(Scanner scanner) {
+        String date;
+        Pattern datePattern = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+        while (true) {
+            date = scanner.next();
+            Matcher matcher = datePattern.matcher(date);
+            if (matcher.matches()) {
+                return date;
+            } else {
+                System.out.println(
+                    "Invalid date format. Please enter a date in the format 'yyyy-mm-dd':"
+                );
+            }
+        }
+    }
+
+    private static boolean getBooleanInput(Scanner scanner) {
+        while (true) {
+            String input = scanner.next().toLowerCase();
+            if (input.equals("true") || input.equals("false")) {
+                return Boolean.parseBoolean(input);
+            } else {
+                System.out.println(
+                    "Invalid input. Please enter 'true' or 'false':"
+                );
+            }
+        }
+    }
 }

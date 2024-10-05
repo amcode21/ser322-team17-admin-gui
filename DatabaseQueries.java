@@ -393,6 +393,67 @@ public class DatabaseQueries {
         });
     }
 
+    public void updateSongName(int songID, String songName) {
+        String query = "UPDATE SONGS SET song_name=? WHERE song_id=?";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, songName);
+            ps.setInt(2, songID);
+        });
+    }
+
+    public void updateSongCategory(int songID, String category) {
+        String query = "UPDATE SONGS SET category=? WHERE song_id=?";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, category);
+            ps.setInt(2, songID);
+        });
+    }
+
+    public void updateSongProducer(int songID, String producer) {
+        String query = "UPDATE SONGS SET producer=? WHERE song_id=?";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, producer);
+            ps.setInt(2, songID);
+        });
+    }
+
+    public void updateSongCredits(int songID, String credits) {
+        String query = "UPDATE SONGS SET credits=? WHERE song_id=?";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, credits);
+            ps.setInt(2, songID);
+        });
+    }
+
+    public void updatePlaylistName(int playlistID, String name) {
+        String query =
+            "UPDATE PLAYLISTS SET playlist_name=? WHERE playlist_id=?";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, name);
+            ps.setInt(2, playlistID);
+        });
+    }
+
+    public void updatePlaylistDescription(int playlistID, String description) {
+        String query = "UPDATE PLAYLISTS SET description=? WHERE playlist_id=?";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setString(1, description);
+            ps.setInt(2, playlistID);
+        });
+    }
+
+    public void updatePlaylistPublishedStatus(
+        int playlistID,
+        boolean publishedStatus
+    ) {
+        String query =
+            "UPDATE PLAYLISTS SET published_status=? WHERE playlist_id=?";
+        executeInsertOrUpdate(query, ps -> {
+            ps.setBoolean(1, publishedStatus);
+            ps.setInt(2, playlistID);
+        });
+    }
+
     // ======================= DELETE METHODS =======================
 
     public void deleteUser(int userID) {
@@ -441,31 +502,17 @@ public class DatabaseQueries {
 
     // ======================= UTILITY METHODS =======================
 
-    private int getMaxStringLength(String table, String value) {
-        table = table.replaceAll(";", "");
-        String query =
-            "SELECT max(length(" + value + ")) FROM (" + table + ") as t1;";
-        try (
-            Connection conn = connect();
-            Statement s = conn.createStatement()
-        ) {
-            try (ResultSet rs = s.executeQuery(query)) {
-                rs.next();
-                return rs.getInt(1);
-            }
-        } catch (SQLException | ClassNotFoundException e) {
-            handleException(e);
-            return 0;
-        }
-    }
-
     private void executeInsertOrUpdate(
         String query,
         PreparedStatementSetter setter
     ) {
         try (
             Connection conn = connect();
-            PreparedStatement ps = conn.prepareStatement(query)
+            PreparedStatement ps = conn.prepareStatement(
+                query,
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            );
         ) {
             conn.setAutoCommit(false);
             setter.setParameters(ps);
@@ -486,7 +533,11 @@ public class DatabaseQueries {
     private void executeSelect(String query, PreparedStatementSetter setter) {
         try (
             Connection conn = connect();
-            PreparedStatement ps = conn.prepareStatement(query)
+            PreparedStatement ps = conn.prepareStatement(
+                query,
+                ResultSet.TYPE_SCROLL_INSENSITIVE,
+                ResultSet.CONCUR_READ_ONLY
+            );
         ) {
             if (setter != null) {
                 setter.setParameters(ps);
@@ -518,16 +569,31 @@ public class DatabaseQueries {
         throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
+
+        // Initialize an array to store the maximum lengths of each column
         int[] columnLengths = new int[columnCount];
+
+        // Set initial column lengths to the length of the column names
         for (int i = 1; i <= columnCount; i++) {
-            if (isStringCol(metaData.getColumnLabel(i))) {
-                columnLengths[i - 1] = Math.max(
-                    getMaxStringLength(query, metaData.getColumnLabel(i)),
-                    metaData.getColumnLabel(i).length()
-                );
-            } else {
-                columnLengths[i - 1] = metaData.getColumnLabel(i).length();
+            columnLengths[i - 1] = metaData.getColumnLabel(i).length();
+        }
+
+        // First, iterate through the ResultSet once to determine the maximum column lengths
+        while (rs.next()) {
+            for (int i = 1; i <= columnCount; i++) {
+                Object value = rs.getObject(i);
+                if (value != null) {
+                    // Update the column length if the current value is longer
+                    columnLengths[i - 1] = Math.max(
+                        columnLengths[i - 1],
+                        value.toString().length()
+                    );
+                }
             }
+        }
+
+        // Print the column headers with appropriate spacing
+        for (int i = 1; i <= columnCount; i++) {
             System.out.printf(
                 "%-" + columnLengths[i - 1] + "s",
                 metaData.getColumnLabel(i)
@@ -535,6 +601,11 @@ public class DatabaseQueries {
             System.out.print("\t");
         }
         System.out.println();
+
+        // Move the cursor back to the start to print the result rows again
+        rs.beforeFirst();
+
+        // Print each row in the ResultSet
         while (rs.next()) {
             for (int i = 1; i <= columnCount; i++) {
                 Object value = rs.getObject(i);
