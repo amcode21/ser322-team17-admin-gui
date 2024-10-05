@@ -543,29 +543,14 @@ public class DatabaseQueries {
                 setter.setParameters(ps);
             }
             try (ResultSet rs = ps.executeQuery()) {
-                printResultSet(rs, query);
+                printResultSet(rs);
             }
         } catch (SQLException | ClassNotFoundException e) {
             handleException(e);
         }
     }
 
-    private boolean isStringCol(String colLabel) {
-        return (
-            colLabel.equals("username") ||
-            colLabel.equals("billing_details") ||
-            colLabel.equals("name") ||
-            colLabel.equals("description") ||
-            colLabel.equals("image") ||
-            colLabel.equals("song_name") ||
-            colLabel.equals("category") ||
-            colLabel.equals("producer") ||
-            colLabel.equals("credits") ||
-            colLabel.equals("playlist_name")
-        );
-    }
-
-    private void printResultSet(ResultSet rs, String query)
+    private void printResultSet(ResultSet rs)
         throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         int columnCount = metaData.getColumnCount();
